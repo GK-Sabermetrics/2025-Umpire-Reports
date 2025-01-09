@@ -1,0 +1,120 @@
+---
+output:
+  pdf_document: 
+    latex_engine: xelatex
+    keep_tex: false
+geometry: 
+  - paperwidth=8.5in
+  - paperheight=11in
+  - margin=0.05in 
+ 
+header-includes:
+  \usepackage{fontspec}
+  \setmainfont{Arial}
+  \usepackage{booktabs}
+  \usepackage{colortbl}
+  \usepackage{subfig}
+  \usepackage{floatrow}
+  \usepackage{sectsty}
+  \usepackage{titlesec}
+  \graphicspath{{/Users/garrettkemp/Documents/Mercer Baseball/Photos for Graphics/Sailor-Bear}}
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(gridExtra)
+library(gtsummary)
+library(pak)
+library(kableExtra)
+library(knitr)
+library(scales)
+library(pandoc)
+library(ggrepel)
+library(ggplot2)
+opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(fig.pos = '!h')
+```
+
+\begin{minipage}{0.3\textwidth}
+\centering
+\includegraphics[width=2cm, height=2cm]{SailorBearOG}
+\end{minipage}
+\hfill
+\begin{minipage}{0.3\textwidth}
+\begin{center}
+\textbf{\fontsize{20}{20}\selectfont Umpire Report}
+\end{center}
+\end{minipage}
+\hfill
+\begin{minipage}{0.3\textwidth}
+\centering
+\includegraphics[width=3cm, height=2cm]{SoConLogo}
+\end{minipage}
+
+\vspace{-6mm}
+\begin{center}
+\textbf{\fontsize{16}{16}\selectfont Accuracy: `r gsub('%', '\\\\%', params$accuracy)`}
+\end{center}
+
+\vspace{0mm} 
+\begin{center}
+\textbf{\normalsize `r params$date` Mercer vs `r params$opponent`}
+\end{center}
+
+\begin{center}
+\textbf{\normalsize This report is based on a standardized strike zone. 
+Data points on the graph do not represent the actual size of a baseball. 
+Accuracy and missed calls are based on the size of the baseball in relation to 
+the strike zone and "buffer zone".}
+\end{center}
+\vspace{0mm} 
+
+\begin{center}
+\textbf{\normalsize Game Stats}
+\end{center}
+\vspace{-2mm} 
+
+```{r Game Stats, message=FALSE, warning=FALSE}
+
+game_stats %>% 
+  kable(format = "latex",  linesep = "", align = 'c') %>%
+  kable_styling(latex_options = "HOLD_position", position = "center", font_size = 10) %>% 
+  column_spec(1, bold = TRUE, border_left = TRUE, color = "white", 
+              background = case_when(
+                game_stats$PitchCall == "Strike" ~ '#d22d49',
+                game_stats$PitchCall == "Ball" ~ '#00d1ed',
+                TRUE ~ 'black'
+              )
+  ) %>% 
+  row_spec(row = 0, color = "white", background = "#f76800") %>%
+  column_spec(ncol(game_stats), border_right = TRUE) 
+
+
+
+```
+\vspace{0mm}
+```{r, echo=FALSE, warning=FALSE, fig.width=7.8, fig.height = 4, fig.align='center'} 
+gridExtra::grid.arrange(overall_performance_plot, missed_calls_plot, ncol = 2)
+```
+\vspace{0mm}
+```{r, echo=FALSE, warning=FALSE, fig.width=7.8, fig.height = 4, fig.align='center'} 
+gridExtra::grid.arrange(missed_balls_plot, missed_strikes_plot, ncol = 2)
+```
+\newpage
+
+```{r, echo=FALSE, warning=FALSE, fig.width=7.8, fig.height = 4, fig.align='center'} 
+gridExtra::grid.arrange(missed_call_situations_plot, missed_call_distance_plot, ncol = 2)
+```
+
+```{r Missed Calls, message=FALSE, warning=FALSE}
+
+missed_call_list %>% 
+  kable(format = "latex",  linesep = "", align = 'c') %>%
+  kable_styling(latex_options = "HOLD_position", position = "center", font_size = 10) %>% 
+  column_spec(1, border_left = TRUE) %>% 
+  row_spec(row = 0, color = "white", background = "#f76800") %>%
+  column_spec(ncol(missed_call_list), border_right = TRUE) %>% 
+  row_spec(nrow(missed_call_list), border_bottom = )
+
+```
