@@ -102,4 +102,5 @@ point_to_rectangle_distance <- function(PlateLocSide, PlateLocHeight, xmin, xmax
 
 point_to_rectangle_distance(1.01, 3.65, -0.708, 0.708, 1.5, 3.5)
 
+testing
 
